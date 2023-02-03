@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <a href="/01. intro.html">01. intro.html</a>
+  <a href="/02. diff-with-function.html">02. diff-with-function.html</a>
+  <a href="/03. exercise.html">03. exercise.html</a>
+
+  <h1>與傳統函式不同之處</h1>
+  <!-- 箭頭函式 this 指向式不一樣的, 另外無法作為建構函式使用 -->
+
+  <ul>
+    <li>1. this 綁定的差異, 箭頭函式沒有自己的 this</li>
+    <li>2. this 不同，導致 DOM 的 this 也會指向不同位置</li>
+    <li>3. 也無法透過 call, apply, bind 重新給予 this</li>
+    <li>4. 箭頭函式無法作為建構函式使用 ( prototype 為例 )</li>
+  </ul>
+
+  <p>這裡具有一段話</p>
+
+
+  <h1>常見問題</h1>
+
+  <ul>
+    <li>1. 無法直接回傳物件 ()=> {data: 1}, 需補上 ({data: 1})</li>
+    <li>2. 搭配判斷式時, 後面不能直接接箭頭函式 (結構錯誤)</li>
+  </ul>
+
+  <script>
+
+    // 1. This 綁定的差異, 箭頭函式沒有自己的 This
+    var myName = '全域';
+    var person = {
+      myName: '小明',
+
+      // 傳統函式
+      callName: function() { 
+        console.log('1.this.myName:', this.myName); // 1 小明
+        console.log('2.this:', this);
+        // setTimeout 簡易呼叫
+        setTimeout(function() {
+          console.log('3.this.myName:', this.myName); // 2 全域
+          console.log('4.this:', this);
+        }, 10);
+      },
+
+      // 箭頭函式
+      // callName: () => {
+      //   console.log('1.this.myName:', this.myName); // 1 全域
+      //   console.log('2.this:', this);
+      //   // setTimeout 簡易呼叫
+      //   setTimeout(() => {
+      //     console.log('3.this.myName:', this.myName); // 2 全域
+      //     console.log('4.this:', this);
+      //   }, 10);
+      // },
+    }
+    person.callName();
+
+
+    // 2. this 不同，導致 DOM 的 this 也會指向不同位置
+    function sample_dom(){
+      const ele = document.querySelector('p');
+      // 3.1
+      ele.addEventListener('click', function(){
+        console.log("this:", this)
+      });
+      // 3.2
+      // ele.addEventListener('click', () => {
+      //   console.log("this:", this)
+      // });
+    }
+
+
+    // 3. 也無法透過 call, apply, bind 重新給予 this
+    function sample_callapplybind(){
+      const family = {
+        myName: '小明家',
+      }
+      const fn = function(para1, para2){
+        console.log("this:", this);
+        console.log("para1:", para1,"para2:", para2);
+      }
+      // const fn = (para1, para2) => {
+      //   console.log("this:", this);
+      //   console.log("para1:", para1,"para2:", para2);
+      // }
+
+      fn.call(family, '小明', '杰倫');
+      // fn.apply(family, ['小明', '杰倫']);
+      // var fn2 = fn.bind(family, '小明', '杰倫');
+      // fn2();
+    }
+
+
+    // 4. 箭頭函式無法作為建構函式使用 ( prototype 為例 )
+    function sample_prototype(){
+      // 傳統函式具有 prototype, 可作為建構函式使用
+      const Fn = function (a) {
+        this.name = a;
+      }
+      // 箭頭函式無法作為建構函式使用
+      const ArrowFn = (a) => {
+        this.name = a;
+      }
+  
+      console.log("Fn.prototype:", Fn.prototype);
+      console.log("ArrowFn.prototype:", ArrowFn.prototype);
+  
+      const a = new Fn('a');
+      console.log("a:", a);
+  
+      const b = new ArrowFn('b');
+    }
+
+
+
+
+    // ----------常見錯誤----------
+
+    // 1. 無法直接回傳物件實字 () => { data: 1 }, 需補上括號
+    function sample_NumObj(){
+      const arrNum = () => 123;
+      console.log("arrNum():", arrNum())
+  
+      const arrFn = () => {data: 1};  // ({data: 1})
+      console.log("arrFn():", arrFn())
+    }
+
+
+    // 2. 搭配判斷式時, 後面不能直接接箭頭函式, 需補上括號 ( 結構錯誤 )
+    function sample_Operators(){
+      let num = 0;
+      const numFn1 = num || function () { return 1 };
+      const numFn2 = num || () => 1;  // (() => 1)
+
+      console.log("numFn1():", numFn1());
+      console.log("numFn2():", numFn2());
+    }
+    
+  </script>
+</body>
+
+</html>
